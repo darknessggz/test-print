@@ -1,147 +1,174 @@
 -- Teleport ui box universal 📡📡📡✅✅
 
-
 local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
-local LocalPlayer = Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
 
 local function createMessageBox(fromPlayer)
+    -- Clean up existing GUI
     if LocalPlayer.PlayerGui:FindFirstChild("GoToPrompt") then
         LocalPlayer.PlayerGui.GoToPrompt:Destroy()
     end
 
-    local gui = Instance.new("ScreenGui")
-    gui.Name = "GoToPrompt"
-    gui.ResetOnSpawn = false
-    gui.Parent = LocalPlayer.PlayerGui
-    gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    local gui = Instance.new("ScreenGui")  
+    gui.Name = "GoToPrompt"  
+    gui.ResetOnSpawn = false  
+    gui.Parent = LocalPlayer.PlayerGui  
+    gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling  
 
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 100, 0, 80)
-    frame.Position = UDim2.new(0.5, 150, 0.22, 0) -- moved 150 pixels (5 cm) right
-    frame.AnchorPoint = Vector2.new(0.5, 0.5)
-    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    frame.BackgroundTransparency = 1
-    frame.BorderSizePixel = 0
-    frame.ClipsDescendants = true
-    frame.ZIndex = 10
-    frame.Parent = gui
+    local frame = Instance.new("Frame")  
+    frame.Size = UDim2.new(0, 100, 0, 80)  
+    frame.Position = UDim2.new(0.5, 150, 0.22, 0) -- moved 150 pixels (5 cm) right  
+    frame.AnchorPoint = Vector2.new(0.5, 0.5)  
+    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)  
+    frame.BackgroundTransparency = 1  
+    frame.BorderSizePixel = 0  
+    frame.ClipsDescendants = true  
+    frame.ZIndex = 10  
+    frame.Parent = gui  
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
-    corner.Parent = frame
+    local corner = Instance.new("UICorner")  
+    corner.CornerRadius = UDim.new(0, 12)  
+    corner.Parent = frame  
 
-    local stroke = Instance.new("UIStroke")
-    stroke.Thickness = 2
-    stroke.Color = Color3.fromRGB(0, 0, 0)
-    stroke.Transparency = 0.7
-    stroke.Parent = frame
+    local stroke = Instance.new("UIStroke")  
+    stroke.Thickness = 2  
+    stroke.Color = Color3.fromRGB(0, 0, 0)  
+    stroke.Transparency = 0.7  
+    stroke.Parent = frame  
 
-    TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-        BackgroundTransparency = 0.3
-    }):Play()
+    TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {  
+        BackgroundTransparency = 0.3  
+    }):Play()  
 
-    local profileImage = Instance.new("ImageLabel")
-    profileImage.Size = UDim2.new(0, 40, 0, 40)
-    profileImage.Position = UDim2.new(0, 5, 0, 5)
-    profileImage.BackgroundTransparency = 1
-    profileImage.Image = Players:GetUserThumbnailAsync(fromPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
-    profileImage.ZIndex = 11
-    profileImage.Parent = frame
+    local profileImage = Instance.new("ImageLabel")  
+    profileImage.Size = UDim2.new(0, 40, 0, 40)  
+    profileImage.Position = UDim2.new(0, 5, 0, 5)  
+    profileImage.BackgroundTransparency = 1  
+    profileImage.Image = Players:GetUserThumbnailAsync(fromPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)  
+    profileImage.ZIndex = 11  
+    profileImage.Parent = frame  
 
-    local nameLabel = Instance.new("TextLabel")
-    nameLabel.Text = "Go to " .. fromPlayer.DisplayName
-    nameLabel.Size = UDim2.new(1, -55, 0, 40)
-    nameLabel.Position = UDim2.new(0, 50, 0, 4)
-    nameLabel.TextColor3 = Color3.new(1, 1, 1)
-    nameLabel.BackgroundTransparency = 1
-    nameLabel.Font = Enum.Font.GothamBold
-    nameLabel.TextScaled = true
-    nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
-    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-    nameLabel.TextYAlignment = Enum.TextYAlignment.Center
-    nameLabel.ZIndex = 11
-    nameLabel.Parent = frame
+    local nameLabel = Instance.new("TextLabel")  
+    nameLabel.Text = "Go to " .. fromPlayer.DisplayName  
+    nameLabel.Size = UDim2.new(1, -55, 0, 40)  
+    nameLabel.Position = UDim2.new(0, 50, 0, 4)  
+    nameLabel.TextColor3 = Color3.new(1, 1, 1)  
+    nameLabel.BackgroundTransparency = 1  
+    nameLabel.Font = Enum.Font.GothamBold  
+    nameLabel.TextScaled = true  
+    nameLabel.TextTruncate = Enum.TextTruncate.AtEnd  
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left  
+    nameLabel.TextYAlignment = Enum.TextYAlignment.Center  
+    nameLabel.ZIndex = 11  
+    nameLabel.Parent = frame  
 
-    local cancelBtn = Instance.new("TextButton")
-    cancelBtn.Text = "❌"
-    cancelBtn.Size = UDim2.new(0, 26, 0, 26)
-    cancelBtn.Position = UDim2.new(0.5, -35, 0, 64)
-    cancelBtn.AnchorPoint = Vector2.new(0.5, 0.5)
-    cancelBtn.BackgroundTransparency = 1
-    cancelBtn.TextColor3 = Color3.fromRGB(255, 85, 85)
-    cancelBtn.Font = Enum.Font.GothamBold
-    cancelBtn.TextScaled = true
-    cancelBtn.ZIndex = 11
-    cancelBtn.Parent = frame
+    local cancelBtn = Instance.new("TextButton")  
+    cancelBtn.Text = "❌"  
+    cancelBtn.Size = UDim2.new(0, 26, 0, 26)  
+    cancelBtn.Position = UDim2.new(0.5, -35, 0, 64)  
+    cancelBtn.AnchorPoint = Vector2.new(0.5, 0.5)  
+    cancelBtn.BackgroundTransparency = 1  
+    cancelBtn.TextColor3 = Color3.fromRGB(255, 85, 85)  
+    cancelBtn.Font = Enum.Font.GothamBold  
+    cancelBtn.TextScaled = true  
+    cancelBtn.ZIndex = 11  
+    cancelBtn.Parent = frame  
 
-    local cancelCorner = Instance.new("UICorner")
-    cancelCorner.CornerRadius = UDim.new(0, 8)
-    cancelCorner.Parent = cancelBtn
+    local cancelCorner = Instance.new("UICorner")  
+    cancelCorner.CornerRadius = UDim.new(0, 8)  
+    cancelCorner.Parent = cancelBtn  
 
-    local cancelStroke = Instance.new("UIStroke")
-    cancelStroke.Thickness = 1
-    cancelStroke.Color = Color3.fromRGB(255, 85, 85)
-    cancelStroke.Transparency = 0.2
-    cancelStroke.Parent = cancelBtn
+    local cancelStroke = Instance.new("UIStroke")  
+    cancelStroke.Thickness = 1  
+    cancelStroke.Color = Color3.fromRGB(255, 85, 85)  
+    cancelStroke.Transparency = 0.2  
+    cancelStroke.Parent = cancelBtn  
 
-    local confirmBtn = Instance.new("TextButton")
-    confirmBtn.Text = "✅"
-    confirmBtn.Size = UDim2.new(0, 26, 0, 26)
-    confirmBtn.Position = UDim2.new(0.5, 35, 0, 64)
-    confirmBtn.AnchorPoint = Vector2.new(0.5, 0.5)
-    confirmBtn.BackgroundTransparency = 1
-    confirmBtn.TextColor3 = Color3.fromRGB(85, 255, 85)
-    confirmBtn.Font = Enum.Font.GothamBold
-    confirmBtn.TextScaled = true
-    confirmBtn.ZIndex = 11
-    confirmBtn.Parent = frame
+    local confirmBtn = Instance.new("TextButton")  
+    confirmBtn.Text = "✅"  
+    confirmBtn.Size = UDim2.new(0, 26, 0, 26)  
+    confirmBtn.Position = UDim2.new(0.5, 35, 0, 64)  
+    confirmBtn.AnchorPoint = Vector2.new(0.5, 0.5)  
+    confirmBtn.BackgroundTransparency = 1  
+    confirmBtn.TextColor3 = Color3.fromRGB(85, 255, 85)  
+    confirmBtn.Font = Enum.Font.GothamBold  
+    confirmBtn.TextScaled = true  
+    confirmBtn.ZIndex = 11  
+    confirmBtn.Parent = frame  
 
-    local confirmCorner = Instance.new("UICorner")
-    confirmCorner.CornerRadius = UDim.new(0, 8)
-    confirmCorner.Parent = confirmBtn
+    local confirmCorner = Instance.new("UICorner")  
+    confirmCorner.CornerRadius = UDim.new(0, 8)  
+    confirmCorner.Parent = confirmBtn  
 
-    local confirmStroke = Instance.new("UIStroke")
-    confirmStroke.Thickness = 1
-    confirmStroke.Color = Color3.fromRGB(85, 255, 85)
-    confirmStroke.Transparency = 0.2
-    confirmStroke.Parent = confirmBtn
+    local confirmStroke = Instance.new("UIStroke")  
+    confirmStroke.Thickness = 1  
+    confirmStroke.Color = Color3.fromRGB(85, 255, 85)  
+    confirmStroke.Transparency = 0.2  
+    confirmStroke.Parent = confirmBtn  
 
-    local function cleanUp()
-        if gui and gui.Parent then
-            gui:Destroy()
+    local function cleanUp()  
+        if gui and gui.Parent then  
+            gui:Destroy()  
+        end  
+    end  
+
+    confirmBtn.MouseButton1Click:Connect(function()  
+        local targetChar = fromPlayer.Character  
+        local myChar = LocalPlayer.Character  
+        if targetChar and targetChar:FindFirstChild("HumanoidRootPart") and myChar and myChar:FindFirstChild("HumanoidRootPart") then  
+            local targetRoot = targetChar.HumanoidRootPart  
+            myChar:MoveTo(targetRoot.Position + Vector3.new(2, 0, 2))  
+        else
+            warn("Teleport failed: Character or HumanoidRootPart not found")
         end
-    end
+        cleanUp()  
+    end)  
 
-    confirmBtn.MouseButton1Click:Connect(function()
-        local targetChar = fromPlayer.Character
-        local myChar = LocalPlayer.Character
-        if targetChar and targetChar:FindFirstChild("HumanoidRootPart") and myChar and myChar:FindFirstChild("HumanoidRootPart") then
-            local targetRoot = targetChar.HumanoidRootPart
-            myChar:MoveTo(targetRoot.Position + Vector3.new(2, 0, 2))
-        end
-        cleanUp()
-    end)
+    cancelBtn.MouseButton1Click:Connect(cleanUp)  
 
-    cancelBtn.MouseButton1Click:Connect(cleanUp)
-
-    task.spawn(function()
-        task.wait(10)
-        cleanUp()
+    task.spawn(function()  
+        task.wait(10)  
+        cleanUp()  
     end)
 end
 
--- Listen to chat messages
-TextChatService.OnIncomingMessage = function(message)
-    if message.TextSource and message.Text then
-        local fromPlayer = Players:GetPlayerByUserId(message.TextSource.UserId)
-        local msg = message.Text:lower()
-        if fromPlayer and fromPlayer ~= LocalPlayer and (string.find(msg, "comee") or string.find(msg, "heree")) then
-            createMessageBox(fromPlayer)
+-- Set up chat listener for a specific player
+local function setupChatListener()
+    TextChatService.OnIncomingMessage = function(message)
+        if message.TextSource and message.Text then
+            local fromPlayer = Players:GetPlayerByUserId(message.TextSource.UserId)
+            local msg = message.Text:lower()
+            if fromPlayer and fromPlayer ~= LocalPlayer and (string.find(msg, "comee") or string.find(msg, "heree")) then
+                createMessageBox(fromPlayer)
+            end
         end
     end
 end
+
+-- Handle new players joining
+Players.PlayerAdded:Connect(function(player)
+    if player == LocalPlayer then
+        setupChatListener()
+    end
+end)
+
+-- Handle local player respawn
+LocalPlayer.CharacterAdded:Connect(function()
+    -- Clean up any existing GUI on respawn
+    if LocalPlayer.PlayerGui:FindFirstChild("GoToPrompt") then
+        LocalPlayer.PlayerGui.GoToPrompt:Destroy()
+    end
+    -- Rebind chat listener
+    setupChatListener()
+end)
+
+-- Initial setup for the local player
+setupChatListener()
+
+
+
 
 
 
