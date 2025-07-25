@@ -1,5 +1,4 @@
 -- Teleport ui box universal 📡📡📡✅✅
-
 -- Configuration
 local allowLocalPlayer = false -- Set to true to allow local player to trigger prompt, false to disable
 
@@ -143,8 +142,10 @@ local function setupChatListener()
         if message.TextSource and message.Text then
             local fromPlayer = Players:GetPlayerByUserId(message.TextSource.UserId)
             local msg = message.Text:lower()
-            if fromPlayer and (allowLocalPlayer or fromPlayer ~= LocalPlayer) and (string.find(msg, "comee") or string.find(msg, "heree")) then
-                createMessageBox(fromPlayer)
+            if fromPlayer and (string.find(msg, "comee") or string.find(msg, "heree")) then
+                if allowLocalPlayer or fromPlayer ~= LocalPlayer then
+                    createMessageBox(fromPlayer)
+                end
             end
         end
     end
@@ -168,9 +169,11 @@ LocalPlayer.CharacterAdded:Connect(function()
 end)
 
 -- Initial setup for the local player
-setupChatListener()
+setupChatListener()  
 
+    
 
+    
 
 
 
