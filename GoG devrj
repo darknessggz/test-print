@@ -1,0 +1,408 @@
+-- Disable collect 
+if game.PlaceId ~= 126884695634066 then return end
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+local playerGui = localPlayer:WaitForChild("PlayerGui")
+
+local isToggled = false
+local countdownRunning = true
+
+-- UI Setup
+local gui = Instance.new("ScreenGui")
+gui.Name = "ProximityToggleUI"
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+gui.ResetOnSpawn = false
+gui.Parent = playerGui
+
+local toggle = Instance.new("TextButton")
+toggle.Name = "ToggleButton"
+toggle.Size = UDim2.new(0, 40, 0, 20)
+toggle.Position = UDim2.new(0, 572, 0, -52) -- New fixed position
+toggle.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+toggle.Text = "5"
+toggle.TextColor3 = Color3.new(1, 1, 1)
+toggle.TextScaled = true
+toggle.Font = Enum.Font.SourceSansBold
+toggle.Active = true
+toggle.AutoButtonColor = true
+toggle.Parent = gui
+
+-- Update all proximity prompts
+local function updateAllPrompts()
+	local farm = workspace:FindFirstChild("Farm")
+	if not farm then return end
+
+	for _, folder in pairs(farm:GetChildren()) do
+		if folder:IsA("Folder") then
+			local sign = folder:FindFirstChild("Sign", true)
+			if sign and sign:GetAttribute("_owner") == localPlayer.Name then
+				local plants = folder:FindFirstChild("Important") and folder.Important:FindFirstChild("Plants_Physical")
+				if plants then
+					for _, model in pairs(plants:GetChildren()) do
+						local fruits = {}
+						local root = model:FindFirstChild("Fruits")
+						if root and #root:GetChildren() > 0 then
+							fruits = root:GetChildren()
+						elseif model:FindFirstChild("Weight", true) then
+							table.insert(fruits, model)
+						end
+						for _, fruit in pairs(fruits) do
+							for _, p in pairs(fruit:GetDescendants()) do
+								if p:IsA("ProximityPrompt") then
+									p.MaxActivationDistance = isToggled and 0 or 10
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+-- New prompts watcher
+workspace.DescendantAdded:Connect(function(descendant)
+	if isToggled and descendant:IsA("ProximityPrompt") then
+		descendant.MaxActivationDistance = 0
+	end
+end)
+
+-- Toggle logic
+local function updateToggleState()
+	if countdownRunning then return end
+
+	isToggled = not isToggled
+	toggle.Text = isToggled and "ON" or "OFF"
+	toggle.BackgroundColor3 = isToggled and Color3.fromRGB(100, 200, 100) or Color3.fromRGB(200, 200, 200)
+	updateAllPrompts()
+end
+
+-- Manual toggle
+toggle.Activated:Connect(function()
+	if countdownRunning then
+		countdownRunning = false
+		toggle.Text = "OFF"
+	end
+	updateToggleState()
+end)
+
+-- Countdown
+task.spawn(function()
+	for i = 5, 1, -1 do
+		if not countdownRunning then return end
+		toggle.Text = tostring(i)
+		task.wait(1)
+	end
+	if countdownRunning then
+		countdownRunning = false
+		isToggled = false
+		updateToggleState()
+	end
+end)
+
+
+--Gear teleport button ✅
+-- Place this script in your executor as a LocalScript
+ 
+if game.PlaceId ~= 126884695634066 then return end
+ 
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+ 
+-- Create a ScreenGui to hold the button
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.Name = "TeleportButtonGui"
+ 
+-- Create a TextButton
+local button = Instance.new("TextButton")
+button.Parent = screenGui
+button.Name = "TeleportButton"
+button.Text = "Gear"
+button.BackgroundColor3 = Color3.fromRGB(75, 0, 130) -- Dark purple color
+button.Size = UDim2.new(0, 60, 0, 20) -- 60 pixels wide, 20 pixels tall
+button.Position = UDim2.new(0, 481, 0, -52) -- Permanent position: X=481, Y=-52
+button.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+button.Font = Enum.Font.SourceSansBold
+button.TextScaled = true
+button.TextWrapped = true
+ 
+-- Define the target CFrame for teleporting
+local targetCFrame = CFrame.new(-285, 3, -14)
+ 
+-- Function to teleport the player
+local function onButtonClicked()
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        character.HumanoidRootPart.CFrame = targetCFrame
+    end
+end
+ 
+-- Connect the button click event
+button.MouseButton1Click:Connect(onButtonClicked)
+
+
+
+-- Pet finder of other players 🔍🧐
+if game.PlaceId ~= 126884695634066 then return end
+ 
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
+ 
+local player = Players.LocalPlayer
+ 
+-- Configuration
+local SAVE_FILE = "pet_finder_pos.txt"
+ 
+-- Default data (only used for MainFrame now)
+local appData = {
+    mainFramePos = {X = {Scale = 0, Offset = 70}, Y = {Scale = 0, Offset = 10}}
+}
+ 
+-- UI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PetFinderUI"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+ 
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Name = "ToggleButton"
+toggleBtn.Text = "🐶"
+toggleBtn.Size = UDim2.new(0, 50, 0, 30)
+toggleBtn.Position = UDim2.new(0, 2, 0, 213)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(144, 170, 144)
+toggleBtn.TextColor3 = Color3.new(1, 1, 1)
+toggleBtn.Font = Enum.Font.SourceSansBold
+toggleBtn.TextSize = 14
+toggleBtn.Parent = screenGui
+ 
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 250, 0, 300)
+mainFrame.Position = UDim2.new(appData.mainFramePos.X.Scale, appData.mainFramePos.X.Offset, appData.mainFramePos.Y.Scale, appData.mainFramePos.Y.Offset)
+mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+mainFrame.BackgroundTransparency = 0.2
+mainFrame.Visible = false
+mainFrame.Parent = screenGui
+ 
+local searchBox = Instance.new("TextBox")
+searchBox.Name = "SearchBox"
+searchBox.Size = UDim2.new(0, 110, 0, 25)
+searchBox.Position = UDim2.new(0, 10, 0, 10)
+searchBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+searchBox.TextColor3 = Color3.new(1, 1, 1)
+searchBox.Font = Enum.Font.SourceSans
+searchBox.TextSize = 14
+searchBox.PlaceholderText = "Search Pets..."
+searchBox.Text = ""
+searchBox.Parent = mainFrame
+ 
+local ageSearchBox = Instance.new("TextBox")
+ageSearchBox.Name = "AgeSearchBox"
+ageSearchBox.Size = UDim2.new(0, 110, 0, 25)
+ageSearchBox.Position = UDim2.new(0, 130, 0, 10)
+ageSearchBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+ageSearchBox.TextColor3 = Color3.new(1, 1, 1)
+ageSearchBox.Font = Enum.Font.SourceSans
+ageSearchBox.TextSize = 14
+ageSearchBox.PlaceholderText = "Search Age..."
+ageSearchBox.Text = ""
+ageSearchBox.Parent = mainFrame
+ 
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.Name = "PetList"
+scrollingFrame.Size = UDim2.new(0, 230, 0, 255)
+scrollingFrame.Position = UDim2.new(0, 10, 0, 45)
+scrollingFrame.BackgroundTransparency = 1
+scrollingFrame.ScrollBarThickness = 5
+scrollingFrame.Parent = mainFrame
+ 
+-- Save / Load
+local function saveData()
+    local success, json = pcall(function()
+        return HttpService:JSONEncode({
+            mainFramePos = appData.mainFramePos
+        })
+    end)
+    if success then
+        pcall(function()
+            writefile(SAVE_FILE, json)
+        end)
+    end
+end
+ 
+local function loadData()
+    local success, data = pcall(function()
+        if isfile(SAVE_FILE) then
+            return HttpService:JSONDecode(readfile(SAVE_FILE))
+        end
+    end)
+    if success and data then
+        if data.mainFramePos and data.mainFramePos.X and data.mainFramePos.Y then
+            appData.mainFramePos = data.mainFramePos
+            mainFrame.Position = UDim2.new(
+                data.mainFramePos.X.Scale or 0,
+                data.mainFramePos.X.Offset or 70,
+                data.mainFramePos.Y.Scale or 0,
+                data.mainFramePos.Y.Offset or 10
+            )
+        end
+    end
+end
+ 
+-- Dragging Logic (only for mainFrame)
+local function makeDraggable(frame)
+    local dragging, dragInput, startPos, startFramePos
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            startPos = input.Position
+            startFramePos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                    if frame == mainFrame then
+                        appData.mainFramePos = {
+                            X = {Scale = frame.Position.X.Scale, Offset = frame.Position.X.Offset},
+                            Y = {Scale = frame.Position.Y.Scale, Offset = frame.Position.Y.Offset}
+                        }
+                        saveData()
+                    end
+                end
+            end)
+        end
+    end)
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - startPos
+            frame.Position = UDim2.new(
+                startFramePos.X.Scale,
+                startFramePos.X.Offset + delta.X,
+                startFramePos.Y.Scale,
+                startFramePos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+ 
+-- Pet Info
+local function extractAge(petName)
+    local age = petName:match("%[Age (%d+)%]")
+    return age and tonumber(age) or nil
+end
+ 
+local function getServerPets()
+    local pets = {}
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= player then
+            local backpack = p:FindFirstChild("Backpack")
+            if backpack then
+                for _, tool in ipairs(backpack:GetChildren()) do
+                    if tool:IsA("Tool") and tool:GetAttribute("PET_UUID") then
+                        table.insert(pets, {
+                            name = tool.Name,
+                            uuid = tool:GetAttribute("PET_UUID"),
+                            owner = p.Name
+                        })
+                    end
+                end
+            end
+        end
+    end
+    return pets
+end
+ 
+-- UI Update
+local function updatePetList()
+    scrollingFrame:ClearAllChildren()
+    local nameSearchText = searchBox.Text:lower()
+    local ageSearchText = ageSearchBox.Text
+    local serverPets = getServerPets()
+    local displayList = {}
+ 
+    if nameSearchText == "" and ageSearchText == "" then
+        local playerPets = {}
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= player then
+                playerPets[p.Name] = {}
+            end
+        end
+        for _, pet in ipairs(serverPets) do
+            if playerPets[pet.owner] then
+                table.insert(playerPets[pet.owner], pet)
+            end
+        end
+        for playerName, pets in pairs(playerPets) do
+            if #pets > 0 then
+                table.insert(displayList, {type = "player", name = playerName})
+                for _, pet in ipairs(pets) do
+                    table.insert(displayList, {type = "pet", name = pet.name, owner = pet.owner})
+                end
+            end
+        end
+    elseif ageSearchText ~= "" then
+        local ageSearch = tonumber(ageSearchText)
+        if ageSearch then
+            local petsWithDiff = {}
+            for _, pet in ipairs(serverPets) do
+                local petAge = extractAge(pet.name)
+                if petAge then
+                    table.insert(petsWithDiff, {
+                        pet = {type = "pet", name = pet.name, owner = pet.owner},
+                        diff = math.abs(petAge - ageSearch)
+                    })
+                end
+            end
+            table.sort(petsWithDiff, function(a, b) return a.diff < b.diff end)
+            for _, entry in ipairs(petsWithDiff) do
+                table.insert(displayList, entry.pet)
+            end
+        end
+    else
+        for _, pet in ipairs(serverPets) do
+            if pet.name:lower():find(nameSearchText) then
+                table.insert(displayList, {type = "pet", name = pet.name, owner = pet.owner})
+            end
+        end
+    end
+ 
+    local yOffset = 0
+    for _, item in ipairs(displayList) do
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Size = UDim2.new(0, 230, 0, 40)
+        textLabel.Position = UDim2.new(0, 10, 0, yOffset)
+        textLabel.BackgroundColor3 = item.type == "player" and Color3.fromRGB(80, 80, 80) or Color3.fromRGB(60, 60, 60)
+        textLabel.TextColor3 = Color3.new(1, 1, 1)
+        textLabel.Font = Enum.Font.SourceSans
+        textLabel.TextSize = 14
+        textLabel.TextXAlignment = Enum.TextXAlignment.Left
+        textLabel.TextYAlignment = Enum.TextYAlignment.Top
+        textLabel.TextWrapped = true
+        textLabel.Text = item.type == "player" and item.name or (item.owner .. "\n  - " .. item.name)
+        textLabel.Parent = scrollingFrame
+        yOffset = yOffset + 45
+    end
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset)
+end
+ 
+-- Connections
+toggleBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = not mainFrame.Visible
+end)
+ 
+searchBox:GetPropertyChangedSignal("Text"):Connect(updatePetList)
+ageSearchBox:GetPropertyChangedSignal("Text"):Connect(updatePetList)
+Players.PlayerAdded:Connect(updatePetList)
+Players.PlayerRemoving:Connect(updatePetList)
+ 
+-- Initialize
+loadData()
+makeDraggable(mainFrame)
+updatePetList()
