@@ -1,5 +1,8 @@
 -- Teleport ui box universal 📡📡📡✅✅
 
+-- Configuration
+local allowLocalPlayer = false -- Set to true to allow local player to trigger prompt, false to disable
+
 local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
 local TweenService = game:GetService("TweenService")
@@ -140,7 +143,7 @@ local function setupChatListener()
         if message.TextSource and message.Text then
             local fromPlayer = Players:GetPlayerByUserId(message.TextSource.UserId)
             local msg = message.Text:lower()
-            if fromPlayer and fromPlayer ~= LocalPlayer and (string.find(msg, "comee") or string.find(msg, "heree")) then
+            if fromPlayer and (allowLocalPlayer or fromPlayer ~= LocalPlayer) and (string.find(msg, "comee") or string.find(msg, "heree")) then
                 createMessageBox(fromPlayer)
             end
         end
@@ -166,7 +169,6 @@ end)
 
 -- Initial setup for the local player
 setupChatListener()
-
 
 
 
