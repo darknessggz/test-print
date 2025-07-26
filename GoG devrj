@@ -178,10 +178,10 @@ setupChatListener()
 
 
 -- Disable collect 👍🏻
+
 if game.PlaceId ~= 126884695634066 then return end
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local localPlayer = Players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui")
 
@@ -198,7 +198,7 @@ gui.Parent = playerGui
 local toggle = Instance.new("TextButton")
 toggle.Name = "ToggleButton"
 toggle.Size = UDim2.new(0, 40, 0, 20)
-toggle.Position = UDim2.new(0, 572, 0, -52) -- New fixed position
+toggle.Position = UDim2.new(0, 572, 0, -52) -- Fixed permanent position
 toggle.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
 toggle.Text = "5"
 toggle.TextColor3 = Color3.new(1, 1, 1)
@@ -208,7 +208,7 @@ toggle.Active = true
 toggle.AutoButtonColor = true
 toggle.Parent = gui
 
--- Update all proximity prompts
+-- Update proximity prompts
 local function updateAllPrompts()
 	local farm = workspace:FindFirstChild("Farm")
 	if not farm then return end
@@ -241,17 +241,33 @@ local function updateAllPrompts()
 	end
 end
 
--- New prompts watcher
+-- Detect new ProximityPrompts safely (only under your plants)
 workspace.DescendantAdded:Connect(function(descendant)
-	if isToggled and descendant:IsA("ProximityPrompt") then
-		descendant.MaxActivationDistance = 0
+	if not isToggled or not descendant:IsA("ProximityPrompt") then return end
+
+	local parentModel = descendant:FindFirstAncestorWhichIsA("Model")
+	if not parentModel then return end
+
+	local farm = workspace:FindFirstChild("Farm")
+	if not farm then return end
+
+	for _, folder in pairs(farm:GetChildren()) do
+		if folder:IsA("Folder") then
+			local sign = folder:FindFirstChild("Sign", true)
+			if sign and sign:GetAttribute("_owner") == localPlayer.Name then
+				local plants = folder:FindFirstChild("Important") and folder.Important:FindFirstChild("Plants_Physical")
+				if plants and plants:IsAncestorOf(parentModel) then
+					descendant.MaxActivationDistance = 0
+					break
+				end
+			end
+		end
 	end
 end)
 
 -- Toggle logic
 local function updateToggleState()
 	if countdownRunning then return end
-
 	isToggled = not isToggled
 	toggle.Text = isToggled and "ON" or "OFF"
 	toggle.BackgroundColor3 = isToggled and Color3.fromRGB(100, 200, 100) or Color3.fromRGB(200, 200, 200)
@@ -267,7 +283,7 @@ toggle.Activated:Connect(function()
 	updateToggleState()
 end)
 
--- Countdown
+-- 5-second countdown start
 task.spawn(function()
 	for i = 5, 1, -1 do
 		if not countdownRunning then return end
@@ -280,6 +296,12 @@ task.spawn(function()
 		updateToggleState()
 	end
 end)
+
+
+
+
+
+
 
 
 --Gear teleport button ✅
