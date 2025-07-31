@@ -176,6 +176,142 @@ setupChatListener()
 
 
 
+--Auto water Gag⛵
+if game.PlaceId ~= 126884695634066 then return end
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- UI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "WaterToggleUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- State
+local toggled = false
+local lockPos = nil
+local radius = 4
+local speed = 0.7
+local yFixed = 0.20 -- final fixed watering height
+local angles = {0, 60, 120, 180, 240, 300}
+local index = 1
+local baseY = 270
+local uiX = 2
+
+-- Toggle Button (Water)
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 50, 0, 20)
+toggleButton.Position = UDim2.new(0, uiX, 0, baseY)
+toggleButton.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+toggleButton.Text = "Water"
+toggleButton.TextSize = 12
+toggleButton.Parent = screenGui
+
+-- Lock Button
+local lockButton = Instance.new("TextButton")
+lockButton.Size = UDim2.new(0, 50, 0, 18)
+lockButton.Position = UDim2.new(0, uiX, 0, baseY - 22)
+lockButton.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+lockButton.Text = "Lock"
+lockButton.TextSize = 11
+lockButton.Parent = screenGui
+
+local lockEnabled = false
+lockButton.MouseButton1Click:Connect(function()
+	lockEnabled = not lockEnabled
+	if lockEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+		lockPos = player.Character.HumanoidRootPart.Position
+	end
+	lockButton.BackgroundColor3 = lockEnabled and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(180, 180, 180)
+end)
+
+-- Radius Box
+local radiusBox = Instance.new("TextBox")
+radiusBox.Size = UDim2.new(0, 45, 0, 20)
+radiusBox.Position = UDim2.new(0, uiX + 55, 0, baseY)
+radiusBox.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+radiusBox.Text = tostring(radius)
+radiusBox.TextSize = 12
+radiusBox.ClearTextOnFocus = false
+radiusBox.Parent = screenGui
+
+-- Speed Box
+local speedBox = Instance.new("TextBox")
+speedBox.Size = UDim2.new(0, 45, 0, 20)
+speedBox.Position = UDim2.new(0, uiX + 105, 0, baseY)
+speedBox.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
+speedBox.Text = tostring(speed)
+speedBox.TextSize = 12
+speedBox.ClearTextOnFocus = false
+speedBox.Parent = screenGui
+
+radiusBox.FocusLost:Connect(function()
+	local val = tonumber(radiusBox.Text)
+	if val then radius = val end
+end)
+
+speedBox.FocusLost:Connect(function()
+	local val = tonumber(speedBox.Text)
+	if val and val > 0 then speed = val end
+end)
+
+toggleButton.MouseButton1Click:Connect(function()
+	toggled = not toggled
+	toggleButton.BackgroundColor3 = toggled and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(180, 180, 180)
+end)
+
+-- Auto Equip Watering Can
+local function autoEquipWateringCan()
+	local backpack = player:FindFirstChild("Backpack")
+	local character = player.Character
+	if not (backpack and character) then return end
+
+	local equipped = character:FindFirstChildOfClass("Tool")
+	if equipped and equipped.Name:lower():find("watering can") then return end
+
+	for _, tool in ipairs(backpack:GetChildren()) do
+		if tool:IsA("Tool") and tool.Name:lower():find("watering can") then
+			tool.Parent = character
+			break
+		end
+	end
+end
+
+-- Fire Loop
+local waterRE = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Water_RE")
+
+task.spawn(function()
+	while true do
+		if toggled then
+			local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+			if root then
+				autoEquipWateringCan()
+
+				local origin = lockEnabled and lockPos or root.Position
+				local angleRad = math.rad(angles[index])
+				index = index % #angles + 1
+
+				local offset = Vector3.new(
+					math.cos(angleRad) * radius,
+					0,
+					math.sin(angleRad) * radius
+				)
+
+				local firePos = Vector3.new(origin.X + offset.X, yFixed, origin.Z + offset.Z)
+				waterRE:FireServer(firePos)
+			end
+		end
+		task.wait(1 / speed)
+	end
+end)
+
+
+
+
+
 
 -- Disable collect 👍🏻
 
