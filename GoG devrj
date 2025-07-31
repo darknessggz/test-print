@@ -442,43 +442,60 @@ end)
 
 --Gear teleport button ✅
 -- Place this script in your executor as a LocalScript
- 
+
 if game.PlaceId ~= 126884695634066 then return end
- 
+
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
- 
--- Create a ScreenGui to hold the button
+
+-- Create a ScreenGui to hold the buttons
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = player:WaitForChild("PlayerGui")
 screenGui.Name = "TeleportButtonGui"
- 
--- Create a TextButton
-local button = Instance.new("TextButton")
-button.Parent = screenGui
-button.Name = "TeleportButton"
-button.Text = "Gear"
-button.BackgroundColor3 = Color3.fromRGB(75, 0, 130) -- Dark purple color
-button.Size = UDim2.new(0, 60, 0, 20) -- 60 pixels wide, 20 pixels tall
-button.Position = UDim2.new(0, 481, 0, -52) -- Permanent position: X=481, Y=-52
-button.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-button.Font = Enum.Font.SourceSansBold
-button.TextScaled = true
-button.TextWrapped = true
- 
--- Define the target CFrame for teleporting
-local targetCFrame = CFrame.new(-285, 3, -14)
- 
--- Function to teleport the player
-local function onButtonClicked()
+
+-- Gear Button
+local gearButton = Instance.new("TextButton")
+gearButton.Parent = screenGui
+gearButton.Name = "TeleportButton"
+gearButton.Text = "Gear"
+gearButton.BackgroundColor3 = Color3.fromRGB(75, 0, 130) -- Dark purple color
+gearButton.Size = UDim2.new(0, 60, 0, 20)
+gearButton.Position = UDim2.new(0, 481, 0, -52)
+gearButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+gearButton.Font = Enum.Font.SourceSansBold
+gearButton.TextScaled = true
+gearButton.TextWrapped = true
+
+local gearTargetCFrame = CFrame.new(-285, 3, -14)
+
+gearButton.MouseButton1Click:Connect(function()
     local character = player.Character
     if character and character:FindFirstChild("HumanoidRootPart") then
-        character.HumanoidRootPart.CFrame = targetCFrame
+        character.HumanoidRootPart.CFrame = gearTargetCFrame
     end
-end
- 
--- Connect the button click event
-button.MouseButton1Click:Connect(onButtonClicked)
+end)
+
+-- Event Button
+local eventButton = Instance.new("TextButton")
+eventButton.Parent = screenGui
+eventButton.Name = "EventButton"
+eventButton.Text = "Event"
+eventButton.BackgroundColor3 = Color3.fromRGB(120, 160, 120) -- Soft greyish green
+eventButton.Size = UDim2.new(0, 60, 0, 20)
+eventButton.Position = UDim2.new(0, 179, 0, 9)
+eventButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+eventButton.Font = Enum.Font.SourceSansBold
+eventButton.TextScaled = true
+eventButton.TextWrapped = true
+
+local eventTargetCFrame = CFrame.new(-56, 5, -17)
+
+eventButton.MouseButton1Click:Connect(function()
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        character.HumanoidRootPart.CFrame = eventTargetCFrame
+    end
+end)
 
 
 
