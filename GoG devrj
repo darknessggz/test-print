@@ -311,6 +311,47 @@ end)
 
 
 
+-- Ping 🛜 
+if game.PlaceId ~= 126884695634066 then return end
+
+-- Place this in StarterPlayerScripts or execute as a LocalScript
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Create GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PingUI"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true -- Removes top bar offset
+screenGui.Parent = playerGui
+
+-- Create compact label
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(0, 65, 0, 18) -- Smaller size
+label.Position = UDim2.new(1, -68, 1, -20) -- Bottom-right corner, flush with edge
+label.BackgroundTransparency = 0.4
+label.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+label.TextColor3 = Color3.fromRGB(255, 255, 255)
+label.Font = Enum.Font.Code
+label.TextSize = 14
+label.Text = "Ping: --"
+label.BorderSizePixel = 0
+label.Parent = screenGui
+
+-- Fast ping updater
+task.spawn(function()
+	while true do
+		local ping = player:GetNetworkPing()
+		if ping then
+			label.Text = "Ping: " .. math.floor(ping * 1000)
+		end
+		task.wait(0.25)
+	end
+end)
+
+
 
 
 -- Disable collect 👍🏻
