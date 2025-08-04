@@ -540,6 +540,211 @@ end)
 
 
 
+-- Recipe 📝 pig event 
+if game.PlaceId ~= 126884695634066 then return end
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PrismaticRecipeGUI"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.DisplayOrder = 1000
+screenGui.Parent = playerGui
+
+-- Toggle button (smaller, moved 150px left, 10px up from bottom edge, anchored bottom-right)
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 70, 0, 24)
+toggleButton.Position = UDim2.new(1, -150, 1, -10)
+toggleButton.AnchorPoint = Vector2.new(1, 1)
+toggleButton.Text = "📜 Recipe"
+toggleButton.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+toggleButton.BackgroundTransparency = 0.3
+toggleButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+toggleButton.TextSize = 14
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.BorderSizePixel = 1
+toggleButton.ZIndex = 10
+toggleButton.Parent = screenGui
+
+-- Recipe frame (smaller, darker grey)
+local recipeFrame = Instance.new("Frame")
+recipeFrame.Size = UDim2.new(0, 280, 0, 280)
+recipeFrame.Position = UDim2.new(0.5, -140, 0.5, -140)
+recipeFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+recipeFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+recipeFrame.Visible = false
+recipeFrame.ZIndex = 10
+recipeFrame.Parent = screenGui
+
+-- Heading
+local heading = Instance.new("TextLabel")
+heading.Size = UDim2.new(1, -40, 0, 28)
+heading.Position = UDim2.new(0, 10, 0, 5)
+heading.BackgroundTransparency = 1
+heading.Text = "🌈 Prismatic Recipes"
+heading.TextColor3 = Color3.fromRGB(30, 30, 30)
+heading.Font = Enum.Font.GothamBold
+heading.TextSize = 18
+heading.TextXAlignment = Enum.TextXAlignment.Left
+heading.ZIndex = 10
+heading.Parent = recipeFrame
+
+-- Close button
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 26, 0, 26)
+closeButton.Position = UDim2.new(1, -31, 0, 5)
+closeButton.Text = "❌"
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 14
+closeButton.ZIndex = 10
+closeButton.Parent = recipeFrame
+
+-- Scrollable area
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.Size = UDim2.new(1, -20, 1, -45)
+scrollingFrame.Position = UDim2.new(0, 10, 0, 40)
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollingFrame.ScrollBarThickness = 6
+scrollingFrame.BackgroundTransparency = 1
+scrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scrollingFrame.VerticalScrollBarInset = Enum.ScrollBarInset.Always
+scrollingFrame.ClipsDescendants = true
+scrollingFrame.ZIndex = 10
+scrollingFrame.Parent = recipeFrame
+
+-- Recipe data
+local recipes = {
+	["🍰 Prismatic Cake"] = {
+		"1 Recipe - 1x Banana + 4x Bone Blossom"
+	},
+	["🌭 Prismatic Hotdog"] = {
+		"1 Recipe - 1x Corn + 4x Bone Blossom"
+	},
+	["🥗 Prismatic Salad"] = {
+		"1 Recipe - 1x Tomato + 4x Bone Blossom"
+	},
+	["🍩 Prismatic Donut"] = {
+		"1 Recipe - 1x Sugar Glaze + 4x Bone Blossom"
+	},
+	["🥧 Prismatic Pie"] = {
+		"1 Recipe - 1x Pumpkin + 4x Bone Blossom"
+	},
+	["🍦 Prismatic Ice Cream"] = {
+		"1 Recipe - 1x Banana + 1x Sugar Apple + 3x Bone Blossom"
+	},
+	["🍕 Prismatic Pizza"] = {
+		"1 Recipe - 1x Sugar Apple + 1x Violet Corn + 3x Bone Blossom"
+	},
+	["🧇 Prismatic Waffle"] = {
+		"1 Recipe - 1x Sugar Glaze + 4x Bone Blossom",
+		"2 Recipe - 1x Sugar Apple + 1x Coconut + 3x Bone Blossom"
+	},
+	["🍣 Prismatic Sushi"] = {
+		"1 Recipe - 1x Bamboo + 4x Bone Blossom",
+		"2 Recipe - 1x Coconut + 4x Bone Blossom"
+	},
+	["🍔 Prismatic Burger"] = {
+		"1 Recipe - 1x Violet Corn + 1x Tomato + 3x Bone Blossom"
+	}
+}
+
+-- Populate scrolling list
+local function populateRecipes()
+	scrollingFrame:ClearAllChildren()
+
+	local layout = Instance.new("UIListLayout")
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
+	layout.Padding = UDim.new(0, 6)
+	layout.Parent = scrollingFrame
+
+	for foodName, recipeList in pairs(recipes) do
+		local title = Instance.new("TextLabel")
+		title.Size = UDim2.new(1, 0, 0, 0)
+		title.AutomaticSize = Enum.AutomaticSize.Y
+		title.BackgroundTransparency = 1
+		title.Text = foodName
+		title.TextColor3 = Color3.fromRGB(30, 30, 30)
+		title.Font = Enum.Font.GothamBold
+		title.TextSize = 17
+		title.TextXAlignment = Enum.TextXAlignment.Left
+		title.TextWrapped = true
+		title.ZIndex = 10
+		title.Parent = scrollingFrame
+
+		for _, recipe in ipairs(recipeList) do
+			-- Create a frame to hold the recipe text and copy button
+			local recipeFrame = Instance.new("Frame")
+			recipeFrame.Size = UDim2.new(1, 0, 0, 0)
+			recipeFrame.AutomaticSize = Enum.AutomaticSize.Y
+			recipeFrame.BackgroundTransparency = 1
+			recipeFrame.ZIndex = 10
+			recipeFrame.Parent = scrollingFrame
+
+			local recipeLayout = Instance.new("UIListLayout")
+			recipeLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			recipeLayout.FillDirection = Enum.FillDirection.Horizontal
+			recipeLayout.Padding = UDim.new(0, 5)
+			recipeLayout.Parent = recipeFrame
+
+			local entry = Instance.new("TextLabel")
+			entry.Size = UDim2.new(1, -50, 0, 0)
+			entry.AutomaticSize = Enum.AutomaticSize.Y
+			entry.BackgroundTransparency = 1
+			entry.Text = "    " .. recipe
+			entry.TextColor3 = Color3.fromRGB(60, 60, 60)
+			entry.Font = Enum.Font.Gotham
+			entry.TextSize = 14
+			entry.TextXAlignment = Enum.TextXAlignment.Left
+			entry.TextWrapped = true
+			entry.TextYAlignment = Enum.TextYAlignment.Top
+			entry.ZIndex = 11
+			entry.Parent = recipeFrame
+
+			local copyButton = Instance.new("TextButton")
+			copyButton.Size = UDim2.new(0, 40, 0, 20)
+			copyButton.Text = "Copy"
+			copyButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+			copyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+			copyButton.Font = Enum.Font.Gotham
+			copyButton.TextSize = 12
+			copyButton.ZIndex = 11
+			copyButton.Parent = recipeFrame
+
+			-- Connect copy button to setclipboard with reformatted recipe name
+			copyButton.MouseButton1Click:Connect(function()
+				local cleanRecipe = string.gsub(recipe, "^%d+ Recipe %- ", "")
+				local emoji, name = string.match(foodName, "^(%S+)%s*(.+)$")
+				local formattedName = name .. " " .. emoji
+				setclipboard(formattedName .. " - " .. cleanRecipe)
+			end)
+		end
+	end
+end
+
+-- Toggle & close
+toggleButton.MouseButton1Click:Connect(function()
+	recipeFrame.Visible = not recipeFrame.Visible
+end)
+
+closeButton.MouseButton1Click:Connect(function()
+	recipeFrame.Visible = false
+end)
+
+-- Load
+populateRecipes()
+
+
+
+
+
+
+
 -- Pet finder of other players 🔍🧐
 if game.PlaceId ~= 126884695634066 then return end
  
