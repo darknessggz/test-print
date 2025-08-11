@@ -529,7 +529,7 @@ eventButton.Font = Enum.Font.SourceSansBold
 eventButton.TextScaled = true
 eventButton.TextWrapped = true
 
-local eventTargetCFrame = CFrame.new(-56, 5, -17)
+local eventTargetCFrame = CFrame.new(-94, 4, -7)
 
 eventButton.MouseButton1Click:Connect(function()
     local character = player.Character
